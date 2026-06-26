@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  
+  --color-primary: #16a37f;
+  --color-primary-dim: rgba(22, 163, 127, 0.1);
+  --color-gold: #d97706;
+  --color-error: #dc2626;
+
+  /* Custom Telegram Colors mapping to Tailwind design system */
+  --color-tg-bg: var(--tg-bg-color);
+  --color-tg-text: var(--tg-text-color);
+  --color-tg-sec-bg: var(--tg-secondary-bg-color);
+  --color-tg-hint: var(--tg-hint-color);
+  --color-tg-button: var(--tg-button-color);
+  --color-tg-button-text: var(--tg-button-text-color);
+}
+
+:root {
+  /* High Density Theme Colors - Light Mode Gold Standard */
+  --tg-bg-color: #ffffff;
+  --tg-text-color: #1a1a1a;
+  --tg-secondary-bg-color: #f4f4f4;
+  --tg-hint-color: #8e8e93;
+  --tg-button-color: #16a37f;
+  --tg-button-text-color: #ffffff;
+  --accent: #16a37f;
+  --accent-dim: rgba(22, 163, 127, 0.1);
+  --gold: #d97706;
+}
+
+/* Dark Mode equivalents for High Density Theme */
+:root.dark {
+  --tg-bg-color: #0c0e14;
+  --tg-text-color: #f3f4f6;
+  --tg-secondary-bg-color: #161a23;
+  --tg-hint-color: #8e919a;
+  --tg-button-color: #16a37f;
+  --tg-button-text-color: #ffffff;
+  --accent: #16a37f;
+  --accent-dim: rgba(22, 163, 127, 0.15);
+  --gold: #f59e0b;
+}
+
+/* Smooth custom animations */
+@layer utilities {
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 250ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 300ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Global resets for High Density Theme desktop mockup / responsive mobile feel */
+html, body {
+  background-color: #f8faf9;
+  color: var(--tg-text-color);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  touch-action: manipulation;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html.dark, body.dark {
+  background-color: #08090d;
+}
+
+#root {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+}
+
+/* Accessibility: Respect user prefers-reduced-motion setting */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-delay: -1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    background-attachment: initial !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+}
+

@@ -1,0 +1,6 @@
+{
+  "name": "Namoz Vaqtlari",
+  "description": "O'zbekiston hududlari uchun aniq namoz vaqtlari, oylik taqvim va Qibla kompasi Telegram Mini ilovasi.",
+  "requestFramePermissions": ["deviceorientation", "geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
