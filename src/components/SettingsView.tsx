@@ -22,6 +22,27 @@ const LANG_MAP: Record<Language, string> = {
   ru:     'ru',
 };
 
+/**
+ * cityId → bot.py REGIONS kaliti
+ * MUHIM: prayerCalc.ts da nameUz 'Fargʻona' (maxsus apostrof),
+ * lekin bot.py "Farg'ona" (oddiy apostrof) kutadi.
+ * Shuning uchun cityId dan to'g'ridan-to'g'ri mapping ishlatamiz.
+ */
+const CITY_REGION_MAP: Record<string, string> = {
+  tashkent:  'Toshkent',
+  andijan:   'Andijon',
+  namangan:  'Namangan',
+  fergana:   "Farg'ona",
+  gulistan:  'Guliston',
+  jizzakh:   'Jizzax',
+  samarkand: 'Samarqand',
+  bukhara:   'Buxoro',
+  navoiy:    'Navoiy',
+  karshi:    'Qarshi',
+  termez:    'Termiz',
+  urgench:   'Urganch',
+};
+
 // ─── Props ──────────────────────────────────────────────────────────────────
 
 interface SettingsViewProps {
@@ -96,7 +117,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     const city = UZ_CITIES.find((c) => c.id === settings.cityId) || UZ_CITIES[0];
 
     const payload = {
-      region:  city.nameUz,                       // "Toshkent", "Andijon" ...
+      region:  CITY_REGION_MAP[settings.cityId] || city.nameUz,
       lang:    LANG_MAP[settings.language] || 'uz',
       advance: settings.preAlertMinutes,
       prayers,
@@ -247,18 +268,30 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       </div>
 
       {/* 3. Saqlash tugmasi ───────────────────────────────────────────────── */}
-      <button
-        onClick={sendToBot}
-        className={`w-full py-4 rounded-2xl font-bold text-[16px] transition-all duration-200 ${
-          saved
-            ? 'bg-green-500 text-white scale-[0.98]'
-            : 'bg-primary text-white active:opacity-80 active:scale-[0.98]'
-        }`}
-      >
-        {saved
-          ? (settings.language === 'ru' ? '✓ Сохранено' : "✓ Saqlandi")
-          : getTranslation(settings.language, 'save')}
-      </button>
+      <div className="flex flex-col items-center gap-2">
+        <button
+          onClick={sendToBot}
+          className={`w-full py-4 rounded-2xl font-bold text-[16px] transition-all duration-200 ${
+            saved
+              ? 'bg-green-500 text-white scale-[0.98]'
+              : 'bg-primary text-white active:opacity-80 active:scale-[0.98]'
+          }`}
+        >
+          {saved
+            ? (settings.language === 'ru' ? '✓ Сохранено' : "✓ Saqlandi")
+            : getTranslation(settings.language, 'save')}
+        </button>
+
+        {!saved && (
+          <p className="text-[11px] text-tg-hint text-center leading-relaxed">
+            {settings.language === 'ru'
+              ? 'После изменений нажмите кнопку «Сохранить»'
+              : settings.language === 'en'
+              ? 'Press Save after making changes'
+              : "O'zgartirishlardan so'ng Saqlash tugmasini bosing"}
+          </p>
+        )}
+      </div>
 
       {/* 4. Overlay Sheet ─────────────────────────────────────────────────── */}
       {activeSelector && (
