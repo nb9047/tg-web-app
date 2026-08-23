@@ -128,12 +128,14 @@ export default function App() {
     setIsFetching(true);
     setFetchError(false);
 
-    const now     = new Date();
-    const month   = now.getMonth() + 1;
-    const day     = now.getDate();
-    const city    = ISLOMAPI_CITY[settings.cityId] || 'Toshkent';
-    const apiUrl  = `https://islomapi.uz/api/daily?region=${encodeURIComponent(city)}&month=${month}&day=${day}`;
-    const proxy   = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
+    const now      = new Date();
+    const year     = now.getFullYear();
+    const month    = now.getMonth() + 1;
+    const day      = now.getDate();
+    const dateStr  = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const city     = ISLOMAPI_CITY[settings.cityId] || 'Toshkent';
+    const apiUrl   = `https://namoz-vaqtlari.more-info.uz:444/api/GetDailyPrayTimes/${encodeURIComponent(city)}/${dateStr}`;
+    const proxy    = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
 
     // islomapi.uz → PrayerTimes
     const mapTimes = (t: Record<string, string>): PrayerTimes => ({
