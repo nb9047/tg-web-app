@@ -8,12 +8,13 @@ import { SettingsView } from './components/SettingsView';
 import { QiblaCompass } from './components/QiblaCompass';
 import { HouseIcon, CalendarIcon, GearIcon, QiblaIcon, RefreshIcon } from './components/Icons';
 
-// ─── islomapi.uz shahar mapping (bot.py bilan bir xil) ───────────────────────
+// ─── Namoz vaqtlari API shahar mapping (bot.py bilan bir xil) ────────────────
+// Manba: https://namoz-vaqtlari.more-info.uz (12 viloyat + Qoraqalpog'iston)
 const ISLOMAPI_CITY: Record<string, string> = {
   tashkent:  'Toshkent',
   andijan:   'Andijon',
   namangan:  'Namangan',
-  fergana:   'Fargʻona',
+  fergana:   'Fargona',
   gulistan:  'Sirdaryo',
   jizzakh:   'Jizzax',
   samarkand: 'Samarqand',
@@ -114,13 +115,20 @@ export default function App() {
     }
   }, []);
 
-  // ── islomapi.uz dan vaqtlarni olish ──────────────────────────────────────
-  // Bot.py bilan AYNAN bir xil API — vaqtlar mos keladi.
+  // ── Namoz vaqtlari API dan vaqtlarni olish ────────────────────────────────
+  // Manba: https://namoz-vaqtlari.more-info.uz — bot.py bilan bir xil manba,
+  // vaqtlar mos keladi.
   //
   // API javobi:
-  // { "times": { "tong_saharlik":"03:05", "quyosh":"05:12",
-  //              "peshin":"12:26", "asr":"17:41",
-  //              "shom_iftor":"20:03", "hufton":"21:46" } }
+  // {
+  //   "isSuccess": true,
+  //   "statusCode": 200,
+  //   "response": {
+  //     "bomdod": "05:25:00", "quyosh": "06:44:00", "peshin": "12:07:00",
+  //     "asr": "15:48:00", "shom": "17:33:00", "xufton": "18:49:00",
+  //     "region": "Toshkent", "date": "2025-10-23"
+  //   }
+  // }
 
   const currentCity = UZ_CITIES.find((c) => c.id === settings.cityId) || UZ_CITIES[0];
 
@@ -137,29 +145,29 @@ export default function App() {
     const apiUrl   = `https://namoz-vaqtlari.more-info.uz:444/api/GetDailyPrayTimes/${encodeURIComponent(city)}/${dateStr}`;
     const proxy    = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
 
-    // islomapi.uz → PrayerTimes
+    // yangi API → PrayerTimes
     const mapTimes = (t: Record<string, string>): PrayerTimes => ({
-      fajr:    t.tong_saharlik || '',  // Bomdod
-      sunrise: t.quyosh        || '',  // Quyosh chiqishi
-      dhuhr:   t.peshin        || '',  // Peshin
-      asr:     t.asr           || '',  // Asr
-      maghrib: t.shom_iftor    || '',  // Shom
-      isha:    t.hufton        || '',  // Xufton
+      fajr:    (t.bomdod || '').slice(0, 5),   // Bomdod
+      sunrise: (t.quyosh || '').slice(0, 5),   // Quyosh chiqishi
+      dhuhr:   (t.peshin || '').slice(0, 5),   // Peshin
+      asr:     (t.asr    || '').slice(0, 5),   // Asr
+      maghrib: (t.shom   || '').slice(0, 5),   // Shom
+      isha:    (t.xufton || '').slice(0, 5),   // Xufton
     });
 
-    // 1-urinish: bevosita islomapi.uz
+    // 1-urinish: bevosita API
     try {
       const res  = await fetch(apiUrl, { signal: AbortSignal.timeout(7000) });
-      if (!res.ok) throw new Error(`islomapi status ${res.status}`);
+      if (!res.ok) throw new Error(`API status ${res.status}`);
       const json = await res.json();
-      if (json?.times) {
-        setApiTimes(mapTimes(json.times));
+      if (json?.isSuccess && json?.response) {
+        setApiTimes(mapTimes(json.response));
         setIsFetching(false);
         return;
       }
-      throw new Error('times topilmadi');
+      throw new Error('response topilmadi');
     } catch (err) {
-      console.warn('islomapi.uz bevosita urinish muvaffaqiyatsiz:', err);
+      console.warn('Bevosita urinish muvaffaqiyatsiz:', err);
     }
 
     // 2-urinish: CORS proxy orqali
@@ -168,12 +176,12 @@ export default function App() {
       if (!res.ok) throw new Error(`proxy status ${res.status}`);
       const wrapper = await res.json();
       const json    = JSON.parse(wrapper.contents || '{}');
-      if (json?.times) {
-        setApiTimes(mapTimes(json.times));
+      if (json?.isSuccess && json?.response) {
+        setApiTimes(mapTimes(json.response));
         setIsFetching(false);
         return;
       }
-      throw new Error('proxy: times topilmadi');
+      throw new Error('proxy: response topilmadi');
     } catch (proxyErr) {
       console.error('Barcha urinishlar muvaffaqiyatsiz. Offline rejim:', proxyErr);
       setFetchError(true);
