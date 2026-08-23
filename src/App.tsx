@@ -13,15 +13,15 @@ const ISLOMAPI_CITY: Record<string, string> = {
   tashkent:  'Toshkent',
   andijan:   'Andijon',
   namangan:  'Namangan',
-  fergana:   "Farg'ona",
-  gulistan:  'Guliston',
+  fergana:   'Fargʻona',
+  gulistan:  'Sirdaryo',
   jizzakh:   'Jizzax',
   samarkand: 'Samarqand',
   bukhara:   'Buxoro',
   navoiy:    'Navoiy',
-  karshi:    'Qarshi',
-  termez:    'Termiz',
-  urgench:   'Urganch',
+  karshi:    'Qashqadaryo',
+  termez:    'Surxandaryo',
+  urgench:   'Xorazm',
 };
 
 // ─── Default Settings ─────────────────────────────────────────────────────────
