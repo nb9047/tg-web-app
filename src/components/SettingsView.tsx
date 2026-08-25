@@ -8,10 +8,10 @@ import { ChevronRightIcon } from './Icons';
 
 /** Frontend namoz kalitlari → bot.py kutadigan kalitlar */
 const PRAYER_KEY_MAP: Record<string, string> = {
-  fajr:    'tong_saharlik',
+  fajr:    'bomdod',
   dhuhr:   'peshin',
   asr:     'asr',
-  maghrib: 'shom_iftor',
+  maghrib: 'shom',
   isha:    'hufton',
 };
 
