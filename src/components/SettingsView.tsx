@@ -32,15 +32,15 @@ const CITY_REGION_MAP: Record<string, string> = {
   tashkent:  'Toshkent',
   andijan:   'Andijon',
   namangan:  'Namangan',
-  fergana:   "Farg'ona",
-  gulistan:  'Guliston',
+  fergana:   'Fargona',
+  gulistan:  'Sirdaryo',
   jizzakh:   'Jizzax',
   samarkand: 'Samarqand',
   bukhara:   'Buxoro',
   navoiy:    'Navoiy',
-  karshi:    'Qarshi',
-  termez:    'Termiz',
-  urgench:   'Urganch',
+  karshi:    'Qashqadaryo',
+  termez:    'Surxondaryo',
+  urgench:   'Xorazm',
 };
 
 // ─── Props ──────────────────────────────────────────────────────────────────
