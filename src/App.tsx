@@ -25,6 +25,22 @@ const ISLOMAPI_CITY: Record<string, string> = {
   urgench:   'Xorazm',
 };
 
+// namozvaqti.uz scraping uchun shahar slug'lari
+const SCRAPE_CITY: Record<string, string> = {
+  tashkent:  'toshkent',
+  andijan:   'andijon',
+  namangan:  'namangan',
+  fergana:   'fargona',
+  gulistan:  'sirdaryo',
+  jizzakh:   'jizzax',
+  samarkand: 'samarqand',
+  bukhara:   'buxoro',
+  navoiy:    'navoiy',
+  karshi:    'qarshi',
+  termez:    'termiz',
+  urgench:   'urganch',
+};
+
 // ─── Default Settings ─────────────────────────────────────────────────────────
 const DEFAULT_SETTINGS: Settings = {
   cityId: 'tashkent',
@@ -132,6 +148,38 @@ export default function App() {
 
   const currentCity = UZ_CITIES.find((c) => c.id === settings.cityId) || UZ_CITIES[0];
 
+  const PRAYER_ORDER = ['Bomdod', 'Quyosh', 'Peshin', 'Asr', 'Shom', 'Xufton'];
+
+  function parseNamozvaqtiHtml(html: string): PrayerTimes | null {
+    const text = html.replace(/<[^>]+>/g, '\n');
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    const timeRe = /^([01]\d|2[0-3]):[0-5]\d$/;
+    const result: Record<string, string> = {};
+  
+    for (let i = 0; i < lines.length; i++) {
+      if (timeRe.test(lines[i])) {
+        for (let j = i + 1; j < Math.min(i + 4, lines.length); j++) {
+          const match = PRAYER_ORDER.find(p => p.toLowerCase() === lines[j].toLowerCase());
+          if (match) {
+            if (!result[match]) result[match] = lines[i];
+            break;
+          }
+        }
+      }
+    }
+  
+    if (Object.keys(result).length < 5) return null;
+  
+    return {
+      fajr:    result['Bomdod'] || '',
+      sunrise: result['Quyosh'] || '',
+      dhuhr:   result['Peshin'] || '',
+      asr:     result['Asr']    || '',
+      maghrib: result['Shom']   || '',
+      isha:    result['Xufton'] || '',
+    };
+  }
+  
   const fetchOnlineTimes = async () => {
     setIsFetching(true);
     setFetchError(false);
@@ -145,6 +193,26 @@ export default function App() {
     const apiUrl   = `https://namoz-vaqtlari.more-info.uz:444/api/GetDailyPrayTimes/${encodeURIComponent(city)}/${dateStr}`;
     const proxy    = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
 
+    const slug = SCRAPE_CITY[settings.cityId];
+    if (slug) {
+      const scrapeUrl = `https://namozvaqti.uz/shahar/${slug}`;
+      const scrapeProxy = `https://api.allorigins.win/get?url=${encodeURIComponent(scrapeUrl)}`;
+      try {
+        const res = await fetch(scrapeProxy, { signal: AbortSignal.timeout(10000) });
+        if (res.ok) {
+          const wrapper = await res.json();
+          const parsed = parseNamozvaqtiHtml(wrapper.contents || '');
+          if (parsed) {
+            setApiTimes(parsed);
+            setIsFetching(false);
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('namozvaqti.uz scrape muvaffaqiyatsiz:', err);
+      }
+    }
+    
     // yangi API → PrayerTimes
     const mapTimes = (t: Record<string, string>): PrayerTimes => ({
       fajr:    (t.bomdod || '').slice(0, 5),   // Bomdod
